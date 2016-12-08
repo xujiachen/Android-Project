@@ -1,6 +1,8 @@
 package com.androidServer.Database;
 
+import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import com.androidServer.entity.Comment;
@@ -18,12 +20,14 @@ public class commentDatabaseImpl {
 
 	public void createComment(Comment comment) {
 		try {
-		sql = "insert into comments (missionUsername, missionName, comment,username) values(?,?,?,?)";
+		sql = "insert into comments (missionUsername, missionName, comment,username,date) values(?,?,?,?,?)";
 		statement = (PreparedStatement)connection.prepareStatement(sql);
 		statement.setString(1, comment.getMissionUsername());
 		statement.setString(2, comment.getMissionName());
 		statement.setString(3, comment.getComment());
 		statement.setString(4, comment.getUsername());
+		statement.setTimestamp(5, new Timestamp(comment.getDate().getTime()));
+		statement.setString(6, comment.getIsNew());
 		statement.executeUpdate();
 		statement.close();
 		} catch (Exception e) {
@@ -62,18 +66,17 @@ public class commentDatabaseImpl {
 			e.printStackTrace();
 		}
 	}*/
-	public ArrayList<Comment> findAllComment(String username,String missionName,String missionUsername) {
+	public ArrayList<Comment> findAllComment(String missionName,String missionUsername) {
 		Comment comment = null;
 		ArrayList<Comment> arrayList = new ArrayList<>();
 		try {
-			sql = "select * from comments where missionUsername=? and missionName=? and username=?";
+			sql = "select * from comments where missionUsername=? and missionName=?";
 			statement = (PreparedStatement)connection.prepareStatement(sql);
 			statement.setString(1, missionUsername);
 			statement.setString(2, missionName);
-			statement.setString(3, username);
 			ResultSet resultSet = statement.executeQuery();
 			while (resultSet.next()) {
-			comment = new Comment(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3),resultSet.getString(4));
+			comment = new Comment(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3),resultSet.getString(4),resultSet.getTimestamp(5), resultSet.getString(6));
 			arrayList.add(comment);
 			}
 			return arrayList;

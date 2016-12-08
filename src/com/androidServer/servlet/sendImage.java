@@ -71,9 +71,12 @@ public class sendImage extends HttpServlet {
 		response.setContentType("text/html");
 		response.setCharacterEncoding("UTF-8");
 		String strImg = request.getParameter("image");
-		String name = request.getParameter("name");
+		String username = request.getParameter("username");
+		//String name = request.getParameter("name");
 		//byte[] bytes = strImg.getBytes();
-	    File dir = new File(File.separator + "home" + File.separator + "xujiachen" + File.separator + "ImageServer" + File.separator + name + ".txt");
+		String message = "";
+		String route = File.separator + "home" + File.separator + "xujiachen" + File.separator + "ImageServer" + File.separator + username + ".txt";
+	    File dir = new File(route);
 	    if (dir.exists()) {
 	    	dir.delete();
 	    }
@@ -82,11 +85,32 @@ public class sendImage extends HttpServlet {
 	    	
 	    	PrintStream ps = new PrintStream(new FileOutputStream(dir));
 	    	ps.print(strImg);
+	    	ps.close();
+	    	
+	    	User user = userDatabase.findUserByName(username);
+	    	User newUser = new User(user.getUsername(), user.getPassword(), route, user.getDescription(), user.getMoney());
+	    	userDatabase.updateUser(newUser);
+	    	message = toJsonString("Success");
+	    	
+	    	PrintWriter out = response.getWriter();
+	    	out.println(message);
+	    	out.flush();
+	    	out.close();
 	    } catch (Exception e) {
 			e.printStackTrace();
+			message = toJsonString("Fail");
+			PrintWriter out = response.getWriter();
+	    	out.println(message);
+	    	out.flush();
+	    	out.close();
 		}
 	    
 	    
 	}
 
+	private String toJsonString(String status) {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("Status", status);
+		return jsonObject.toString();
+	}
 }
