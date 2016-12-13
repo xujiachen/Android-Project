@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
+
 import com.androidServer.Database.commentDatabaseImpl;
 import com.androidServer.Database.missionDatabaseImpl;
 import com.androidServer.Database.userDatabaseImpl;
@@ -23,35 +25,43 @@ import com.androidServer.entity.Mission;
 import com.androidServer.entity.User;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
-import com.sun.prism.shader.FillRoundRect_Color_AlphaTest_Loader;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.IO;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import sun.security.x509.PrivateKeyUsageExtension;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class noticeServlet
+ * Servlet implementation class ownMission
  */
-@WebServlet(name = "noticeServlet",
-urlPatterns = { "/noticeServlet" }
+@WebServlet(name = "ownMission",
+urlPatterns = { "/ownMission" }
 )
-public class noticeServlet extends HttpServlet {
+public class ownMission extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private missionDatabaseImpl missionDatabase;
-	private commentDatabaseImpl commentDatabase;
-	private Connection connection;   
+	private missionDatabaseImpl misstionDatabase;
+	private Connection connection;
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public noticeServlet() {
+    public ownMission() {
         super();
         GetConnection connectionClass = new GetConnection();
         connection = connectionClass.getConnection();
-        missionDatabase = new missionDatabaseImpl(connection);
-        commentDatabase = new commentDatabaseImpl(connection);
+        misstionDatabase = new missionDatabaseImpl(connection);
     }
 
 	/**
@@ -59,28 +69,30 @@ public class noticeServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.setContentType("text/html");
-		response.setCharacterEncoding("UTF-8");
-		
 		String username = request.getParameter("username");
+		
 		username = URLDecoder.decode(username, "UTF-8");
 		
-		String message = toJsonString("No new message", username, "", "", "", new Date());
-		
-		ArrayList<Mission> missions = missionDatabase.findMissionByUser(username);
-		for (int i = 0; i < missions.size(); i++) {
-			ArrayList<Comment> comments = commentDatabase.findAllComment(missions.get(i).getMissionName(), username);
-			for (int j = 0; j < comments.size(); j++) {
-				Comment comment = comments.get(j);
-				//toJsonString("No new message", username, "", "", "", new Date(""));
-				if (comment.getIsNew().equals("true")) {
-					message = toJsonString("Success", username, comment.getMissionName(), comment.getMissionUsername(), comment.getComment(), comment.getDate());
-					comment.setIsNew("false");
-					i = missions.size() + 1;
-					break;
-				}
+		String message = "";
+		JSONArray jsonArray = new JSONArray();
+		ArrayList<Mission> arrayList = new ArrayList<>();
+		arrayList = misstionDatabase.findMissionByUser(username);
+		if (!username.equals("") && arrayList.size() != 0) {	
+			for (int i = 0; i < arrayList.size(); i++) {
+				JSONObject jsonObject = toJsonObj("Success", arrayList.get(i).getMissionName(), arrayList.get(i).getUsername(), arrayList.get(i).getMoney(), arrayList.get(i).getDate());
+				jsonArray.add(jsonObject);
 			}
+			//message = jsonArray.toString();
+		} 
+		else if (arrayList.size() == 0) {
+			JSONObject jsonObject = toJsonObj("Empty", "", "", 0, new Date());
+			jsonArray.add(jsonObject);
 		}
+		else {
+			JSONObject jsonObject = toJsonObj("Fail", "", "", 0, new Date());
+			jsonArray.add(jsonObject);
+		}
+		message = jsonArray.toString();
 		
 		PrintWriter out = response.getWriter();
 		out.print(message);
@@ -95,16 +107,13 @@ public class noticeServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-	
-	private String toJsonString(String status, String username, String missionName, String commentor, String comment,Date date) {
+	private JSONObject toJsonObj(String status, String missionName, String userName, int gold, Date date) {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("Status", status);
-		jsonObject.put("Username", username);
 		jsonObject.put("Missionname", missionName);
-		jsonObject.put("Commentor", commentor);
-		jsonObject.put("Comment", comment);
+		jsonObject.put("Username", userName);
+		jsonObject.put("Gold", gold);
 		jsonObject.put("Date", date);
-		return jsonObject.toString();
+		return jsonObject;
 	}
-
 }

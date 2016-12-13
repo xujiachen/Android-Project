@@ -2,7 +2,12 @@ package com.androidServer.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -55,29 +60,54 @@ public class menuServlet extends HttpServlet {
 		response.setContentType("text/html");
 		response.setCharacterEncoding("UTF-8");
 		String type = request.getParameter("type");
+
 		String city = request.getParameter("city");
+		
+		System.out.println(type+"哈达好三dasdasdasd");
+		System.out.println(city+"哈达好三dasdsadsad");
+		
+		String decode = URLDecoder.decode(type, "UTF-8");
+		String decode2 = URLDecoder.decode(city, "UTF-8");
+		System.out.println(decode+"哈达好三");
+		System.out.println(decode2+"哈达好三");
 		String message = "";
 		JSONArray jsonArray = new JSONArray();
-		
-		if (!type.equals("") && !city.equals("")) {
-			ArrayList<Map<String, String> > missions = misstionDatabase.findAllMissionTitle(type, city);
-			for (int i = 0; i < missions.size(); i++) {
-				Map<String , String> mission = missions.get(i);
-				JSONObject temp = toJsonObj("Success", mission.get("missionName"), mission.get("username"), Integer.parseInt(mission.get("gold")), new Date(mission.get("date")));;
+		try {
+			if (!type.equals("") && !city.equals("")) {
+				ArrayList<Map<String, String> > missions = misstionDatabase.findAllMissionTitle(decode, decode2);
+				for (int i = 0; i < missions.size(); i++) {
+					Map<String , String> mission = missions.get(i);
+					Date date = strTodate(mission.get("date"));
+					
+					JSONObject temp = toJsonObj("Success", mission.get("missionName"), mission.get("username"), Integer.parseInt(mission.get("gold")), mission.get("date"));
+					jsonArray.add(temp);
+				}
+				if (missions.size() == 0) {
+					JSONObject temp = toJsonObj("Empty", "", "", 0, new Date().toString());
+					jsonArray.add(temp);
+				}
+				
+			} else {
+				JSONObject temp = toJsonObj("Fail", "", "", 0, new Date().toString());
 				jsonArray.add(temp);
 			}
+			message = jsonArray.toString();
 			
-		} else {
-			JSONObject temp = toJsonObj("Fail", "", "", 0, new Date(""));
+			PrintWriter out = response.getWriter();
+			out.print(message);
+			out.flush();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			JSONObject temp = toJsonObj("Fail", "", "", 0, new Date().toString());
 			jsonArray.add(temp);
+			message = jsonArray.toString();
+			
+			PrintWriter out = response.getWriter();
+			out.print(message);
+			out.flush();
+			out.close();
 		}
-		
-		message = jsonArray.toString();
-		
-		PrintWriter out = response.getWriter();
-		out.print(message);
-		out.flush();
-		out.close();
 	}
 
 	/**
@@ -88,7 +118,7 @@ public class menuServlet extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private JSONObject toJsonObj(String status, String missionName, String userName, int gold, Date date) {
+	private JSONObject toJsonObj(String status, String missionName, String userName, int gold, String date) {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("Status", status);
 		jsonObject.put("Missionname", missionName);
@@ -96,6 +126,13 @@ public class menuServlet extends HttpServlet {
 		jsonObject.put("Gold", gold);
 		jsonObject.put("Date", date);
 		return jsonObject;
+	}
+	
+	private Date strTodate(String strDate) throws ParseException {
+		System.out.println(strDate);
+	    DateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		Date date = format.parse(strDate);
+		return date;
 	}
 
 }

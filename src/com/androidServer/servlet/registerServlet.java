@@ -2,6 +2,7 @@ package com.androidServer.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.text.DateFormat;
@@ -54,6 +55,11 @@ public class registerServlet extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		String operation = request.getParameter("operation");
+		
+		username = URLDecoder.decode(username, "UTF-8");
+		password = URLDecoder.decode(password, "UTF-8");
+		operation = URLDecoder.decode(operation, "UTF-8");
+		
 		User user = userDatabase.findUserByName(username);
 		String message = "";
 		

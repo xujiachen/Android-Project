@@ -114,17 +114,18 @@ public class missionDatabaseImpl {
 	public ArrayList<Map<String, String>> findAllMissionTitle(String type,String city) {
 		ArrayList<Map<String, String>> arrayList = new ArrayList<>();
 		try {
-			sql = "select username,missionName from missions where type=? and city=?";
+			sql = "select username,missionName,money,date from missions where type=? and city=?";
 			statement = (PreparedStatement)connection.prepareStatement(sql);
 			statement.setString(1, type);
 			statement.setString(2, city);
 			ResultSet resultSet = statement.executeQuery();
+			System.out.println(city);
 			while (resultSet.next()) {
 				Map<String, String> tp = new HashMap<>();
 				tp.put("username", resultSet.getString(1));
 				tp.put("missionName", resultSet.getString(2));
-				tp.put("gold", "" + resultSet.getInt(7));
-				tp.put("date", "" + resultSet.getTimestamp(8));
+				tp.put("gold", "" + resultSet.getInt(3));
+				tp.put("date", "" + resultSet.getTimestamp(4));
 				arrayList.add(tp);
 			}
 		} catch (Exception e) {

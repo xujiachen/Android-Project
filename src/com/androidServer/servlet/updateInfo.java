@@ -2,6 +2,7 @@ package com.androidServer.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -46,6 +47,10 @@ public class updateInfo extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		String description = request.getParameter("description");
+		
+		username = URLDecoder.decode(username, "UTF-8");
+		password = URLDecoder.decode(password, "UTF-8");
+		description = URLDecoder.decode(description, "UTF-8");
 		
 		String message = "";
 		

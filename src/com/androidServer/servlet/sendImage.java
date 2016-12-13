@@ -3,8 +3,10 @@ package com.androidServer.servlet;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -16,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.stream.FileImageOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -77,15 +80,26 @@ public class sendImage extends HttpServlet {
 		String message = "";
 		String route = File.separator + "home" + File.separator + "xujiachen" + File.separator + "ImageServer" + File.separator + username + ".txt";
 	    File dir = new File(route);
+	    
+	    BufferedOutputStream bos = null;  
+        FileOutputStream fos = null; 
 	    if (dir.exists()) {
 	    	dir.delete();
 	    }
 	    try {
 	    	dir.createNewFile();
 	    	
-	    	PrintStream ps = new PrintStream(new FileOutputStream(dir));
+	    	/*PrintStream ps = new PrintStream(new FileOutputStream(dir));
+	    	byte[] bytes = strImg.getBytes();
 	    	ps.print(strImg);
-	    	ps.close();
+	    	ps.close();*/
+	    	
+	    	System.out.println(strImg);
+	    	
+	    	byte[] bytes = strImg.getBytes("UTF-8");
+	    	fos = new FileOutputStream(dir);
+	    	bos = new BufferedOutputStream(fos);
+	    	bos.write(bytes);
 	    	
 	    	User user = userDatabase.findUserByName(username);
 	    	User newUser = new User(user.getUsername(), user.getPassword(), route, user.getDescription(), user.getMoney());
@@ -103,8 +117,22 @@ public class sendImage extends HttpServlet {
 	    	out.println(message);
 	    	out.flush();
 	    	out.close();
-		}
-	    
+		} finally {  
+            if (bos != null) {  
+                try {  
+                    bos.close();  
+                } catch (IOException e1) {  
+                    e1.printStackTrace();  
+                }  
+            }  
+            if (fos != null) {  
+                try {  
+                    fos.close();  
+                } catch (IOException e1) {  
+                    e1.printStackTrace();  
+                }  
+            }  
+        }  
 	    
 	}
 

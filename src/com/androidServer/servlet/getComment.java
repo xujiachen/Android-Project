@@ -2,6 +2,7 @@ package com.androidServer.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,6 +72,11 @@ public class getComment extends HttpServlet {
 		
 		String mission = request.getParameter("mission");
 		String publisher = request.getParameter("publisher");
+		
+		mission = URLDecoder.decode(mission, "UTF-8");
+		publisher = URLDecoder.decode(publisher, "UTF-8");
+		
+		
 		String message = "";
 		JSONArray jsonArray = new JSONArray();
 		
@@ -78,11 +84,11 @@ public class getComment extends HttpServlet {
 			ArrayList<Comment> comments = commentDatabase.findAllComment(mission, publisher);
 			for (int i = 0; i < comments.size(); i++) {
 				Comment comment = comments.get(i);
-				JSONObject jsonObject = toJsonObj("Success", comment.getUsername(), comment.getMissionName(), comment.getMissionUsername(), comment.getComment(),comment.getDate());
+				JSONObject jsonObject = toJsonObj("Success", comment.getUsername(), comment.getMissionName(), comment.getMissionUsername(), comment.getComment(),comment.getDate(), comment.getIsAdopt());
 				jsonArray.add(jsonObject);
 			}
 		} else {
-			JSONObject jsonObject = toJsonObj("Fail", "", "", "", "", new Date(""));
+			JSONObject jsonObject = toJsonObj("Fail", "", "", "", "", new Date(""), "");
 			jsonArray.add(jsonObject);
 		}
 		message = jsonArray.toString();
@@ -101,7 +107,7 @@ public class getComment extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private JSONObject toJsonObj(String status, String username, String missionName, String commentor, String comment,Date date) {
+	private JSONObject toJsonObj(String status, String username, String missionName, String commentor, String comment,Date date, String isAdopt) {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("Status", status);
 		jsonObject.put("Username", username);
@@ -109,6 +115,7 @@ public class getComment extends HttpServlet {
 		jsonObject.put("Commentor", commentor);
 		jsonObject.put("Comment", comment);
 		jsonObject.put("Date", date);
+		jsonObject.put("IsAdopt", isAdopt);
 		return jsonObject;
 	}
 

@@ -129,4 +129,34 @@
     <servlet-name>updateInfo</servlet-name>
     <url-pattern>/updateInfo</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>adoptServlet</display-name>
+    <servlet-name>adoptServlet</servlet-name>
+    <servlet-class>com.androidServer.servlet.adoptServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>adoptServlet</servlet-name>
+    <url-pattern>/adoptServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ownMission</display-name>
+    <servlet-name>ownMission</servlet-name>
+    <servlet-class>com.androidServer.servlet.ownMission</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ownMission</servlet-name>
+    <url-pattern>/ownMission</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>sendMission</display-name>
+    <servlet-name>sendMission</servlet-name>
+    <servlet-class>com.androidServer.servlet.sendMission</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>sendMission</servlet-name>
+    <url-pattern>/sendMission</url-pattern>
+  </servlet-mapping>
 </web-app>

@@ -7,7 +7,7 @@ private int money;
 	 this.username = username;
 	 this.password = password;
 	 this.headName = "headName_default";
-	 this.description = "description_default";
+	 this.description = "这个人很懒，什么都没写！";
 	 this.money = 0;
  }
  public User(String username,String password,String headName,String description,int money) {

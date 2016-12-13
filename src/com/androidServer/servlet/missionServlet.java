@@ -2,6 +2,7 @@ package com.androidServer.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,15 +66,18 @@ public class missionServlet extends HttpServlet {
 		
 		//String username = request.getParameter("username");
 		String missionName = request.getParameter("mission");
-		String publisher = request.getParameter("pablisher");
+		String publisher = request.getParameter("publisher");
+		
+		missionName = URLDecoder.decode(missionName, "UTF-8");
+		publisher = URLDecoder.decode(publisher, "UTF-8");
 		
 		String message = "";
 		
 		if (!missionName.equals("") && !publisher.equals("")) {
 			Mission mission = misstionDatabase.findMission(publisher, missionName);
-			message = toJsonString("Success", mission.getContent(), mission.getIsCompleted(), mission.getType(), mission.getCity(), mission.getMoney(), mission.getDate());
+			message = toJsonString("Success", mission.getContent(), mission.getIsCompleted(), mission.getType(), mission.getCity(), mission.getMoney(), mission.getDate().toString());
 		} else {
-			message = toJsonString("Fail", "", "", "", "", 0, new Date(""));
+			message = toJsonString("Fail", "", "", "", "", 0, new Date().toString());
 		}
 		
 		PrintWriter out = response.getWriter();
@@ -90,7 +94,7 @@ public class missionServlet extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private String toJsonString(String status, String content, String isComplete, String type, String city, int gold, Date date) {
+	private String toJsonString(String status, String content, String isComplete, String type, String city, int gold, String date) {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("Status", status);
 		jsonObject.put("Content", content);

@@ -20,7 +20,7 @@ public class commentDatabaseImpl {
 
 	public void createComment(Comment comment) {
 		try {
-		sql = "insert into comments (missionUsername, missionName, comment,username,date) values(?,?,?,?,?)";
+		sql = "insert into comments (missionUsername, missionName, comment,username,date,isNew,isAdopt) values(?,?,?,?,?,?,?)";
 		statement = (PreparedStatement)connection.prepareStatement(sql);
 		statement.setString(1, comment.getMissionUsername());
 		statement.setString(2, comment.getMissionName());
@@ -28,6 +28,7 @@ public class commentDatabaseImpl {
 		statement.setString(4, comment.getUsername());
 		statement.setTimestamp(5, new Timestamp(comment.getDate().getTime()));
 		statement.setString(6, comment.getIsNew());
+		statement.setString(7, comment.getIsAdopt());
 		statement.executeUpdate();
 		statement.close();
 		} catch (Exception e) {
@@ -76,7 +77,7 @@ public class commentDatabaseImpl {
 			statement.setString(2, missionName);
 			ResultSet resultSet = statement.executeQuery();
 			while (resultSet.next()) {
-			comment = new Comment(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3),resultSet.getString(4),resultSet.getTimestamp(5), resultSet.getString(6));
+			comment = new Comment(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3),resultSet.getString(4),resultSet.getTimestamp(5), resultSet.getString(6),resultSet.getString(7));
 			arrayList.add(comment);
 			}
 			return arrayList;
