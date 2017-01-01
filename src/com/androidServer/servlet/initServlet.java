@@ -43,9 +43,9 @@ public class initServlet extends HttpServlet {
         	ResultSet rs = connection.getMetaData().getTables(null, null, "users", null);
         	if (!rs.next()) {
         	 createTables(connection);
-             User user = new User("wujy", "122521", "no pic", "this is a test data", 10);
+             User user = new User("wujy", "122521", "no pic", "this is a test data", 100);
              userDatabase.createUser(user);
-             Mission mission = new Mission("wujy", "有什么大保健的地方性价比高？", "至善园九号", "false", "生活", "广州", 10, new Date());
+             Mission mission = new Mission("wujy", "期末大作业占多少分？", "TA们。。。", "false", "生活", "广州市", 10, new Date());
              missionDatabase.createMission(mission);
         }
         }catch (Exception e) {

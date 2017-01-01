@@ -119,7 +119,6 @@ public class missionDatabaseImpl {
 			statement.setString(1, type);
 			statement.setString(2, city);
 			ResultSet resultSet = statement.executeQuery();
-			System.out.println(city);
 			while (resultSet.next()) {
 				Map<String, String> tp = new HashMap<>();
 				tp.put("username", resultSet.getString(1));

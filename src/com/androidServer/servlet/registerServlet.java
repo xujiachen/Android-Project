@@ -57,13 +57,14 @@ public class registerServlet extends HttpServlet {
 		String operation = request.getParameter("operation");
 		
 		username = URLDecoder.decode(username, "UTF-8");
-		password = URLDecoder.decode(password, "UTF-8");
+		//password = URLDecoder.decode(password, "UTF-8");
 		operation = URLDecoder.decode(operation, "UTF-8");
 		
 		User user = userDatabase.findUserByName(username);
 		String message = "";
 		
 		if (user == null && operation.equals("register")) {
+			password = URLDecoder.decode(password, "UTF-8");
 		    User newUser = new User(username, password);
 		    userDatabase.createUser(newUser);
 		    message = toJsonString("Success");

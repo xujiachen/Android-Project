@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.sql.ResultSet;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -84,11 +86,16 @@ public class getComment extends HttpServlet {
 			ArrayList<Comment> comments = commentDatabase.findAllComment(mission, publisher);
 			for (int i = 0; i < comments.size(); i++) {
 				Comment comment = comments.get(i);
-				JSONObject jsonObject = toJsonObj("Success", comment.getUsername(), comment.getMissionName(), comment.getMissionUsername(), comment.getComment(),comment.getDate(), comment.getIsAdopt());
+				System.out.println(comment.getDate());
+				JSONObject jsonObject = toJsonObj("Success", comment.getMissionUsername(), comment.getMissionName(), comment.getUsername(), comment.getComment(),comment.getDate(), comment.getIsAdopt());
+				jsonArray.add(jsonObject);
+			}
+			if (comments.size() == 0) {
+				JSONObject jsonObject = toJsonObj("Empty", "", "", "", "", new Date(), "");
 				jsonArray.add(jsonObject);
 			}
 		} else {
-			JSONObject jsonObject = toJsonObj("Fail", "", "", "", "", new Date(""), "");
+			JSONObject jsonObject = toJsonObj("Fail", "", "", "", "", new Date(), "");
 			jsonArray.add(jsonObject);
 		}
 		message = jsonArray.toString();
@@ -107,14 +114,16 @@ public class getComment extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private JSONObject toJsonObj(String status, String username, String missionName, String commentor, String comment,Date date, String isAdopt) {
+	private JSONObject toJsonObj(String status, String username, String missionName, String commentor, String comment, Date date, String isAdopt) {
 		JSONObject jsonObject = new JSONObject();
+		DateFormat dFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String str = dFormat.format(date);
 		jsonObject.put("Status", status);
 		jsonObject.put("Username", username);
 		jsonObject.put("Missionname", missionName);
 		jsonObject.put("Commentor", commentor);
 		jsonObject.put("Comment", comment);
-		jsonObject.put("Date", date);
+		jsonObject.put("Date", str);
 		jsonObject.put("IsAdopt", isAdopt);
 		return jsonObject;
 	}

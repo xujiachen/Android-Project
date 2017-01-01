@@ -1,8 +1,10 @@
 package com.androidServer.servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -52,6 +54,10 @@ public class sendMission extends HttpServlet {
 		//doGet(request, response);
 		response.setContentType("text/html");
 		response.setCharacterEncoding("UTF-8");
+		
+	    //System.out.println(request.getContentType());
+		request.setCharacterEncoding("UTF-8");
+		
 		String username = request.getParameter("username");
 		String missionname = request.getParameter("missionname");
 		String content = request.getParameter("content");
@@ -59,16 +65,12 @@ public class sendMission extends HttpServlet {
 		String city = request.getParameter("city");
 		String money = request.getParameter("gold");
 		
-		username = URLDecoder.decode(username, "UTF-8");
-		missionname = URLDecoder.decode(missionname, "UTF-8");
-		content = URLDecoder.decode(content, "UTF-8");
-		type = URLDecoder.decode(type, "UTF-8");
-		city = URLDecoder.decode(city, "UTF-8");
+		
 	    int gold = Integer.parseInt(money);
 		
 	    String message = "";
 	    
-		if (!username.equals("") && !missionname.equals("") && !content.equals("") && !type.equals("") && city.equals("")) {
+		if (!username.equals("") && !missionname.equals("") && !content.equals("") && !type.equals("") && !city.equals("")) {
 			Mission newMission = new Mission(username, missionname, content, "false", type, city, gold, new Date());
 			missionDatabase.createMission(newMission);
 			

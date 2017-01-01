@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.sql.ResultSet;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -75,7 +77,8 @@ public class noticeServlet extends HttpServlet {
 				//toJsonString("No new message", username, "", "", "", new Date(""));
 				if (comment.getIsNew().equals("true")) {
 					message = toJsonString("Success", username, comment.getMissionName(), comment.getMissionUsername(), comment.getComment(), comment.getDate());
-					comment.setIsNew("false");
+					//comment.setIsNew("false");
+				    commentDatabase.updateComment("false", comment.getIsAdopt(), comment.getDate());
 					i = missions.size() + 1;
 					break;
 				}
@@ -97,14 +100,19 @@ public class noticeServlet extends HttpServlet {
 	}
 	
 	private String toJsonString(String status, String username, String missionName, String commentor, String comment,Date date) {
+		Format format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = format.format(date);
+		
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("Status", status);
 		jsonObject.put("Username", username);
 		jsonObject.put("Missionname", missionName);
 		jsonObject.put("Commentor", commentor);
 		jsonObject.put("Comment", comment);
-		jsonObject.put("Date", date);
+		jsonObject.put("Date", time);
 		return jsonObject.toString();
 	}
+	
+	
 
 }

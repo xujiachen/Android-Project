@@ -63,18 +63,14 @@ public class menuServlet extends HttpServlet {
 
 		String city = request.getParameter("city");
 		
-		System.out.println(type+"哈达好三dasdasdasd");
-		System.out.println(city+"哈达好三dasdsadsad");
-		
-		String decode = URLDecoder.decode(type, "UTF-8");
-		String decode2 = URLDecoder.decode(city, "UTF-8");
-		System.out.println(decode+"哈达好三");
-		System.out.println(decode2+"哈达好三");
+		type = URLDecoder.decode(type, "UTF-8");
+		city = URLDecoder.decode(city, "UTF-8");
+
 		String message = "";
 		JSONArray jsonArray = new JSONArray();
 		try {
 			if (!type.equals("") && !city.equals("")) {
-				ArrayList<Map<String, String> > missions = misstionDatabase.findAllMissionTitle(decode, decode2);
+				ArrayList<Map<String, String> > missions = misstionDatabase.findAllMissionTitle(type, city);
 				for (int i = 0; i < missions.size(); i++) {
 					Map<String , String> mission = missions.get(i);
 					Date date = strTodate(mission.get("date"));
@@ -129,7 +125,6 @@ public class menuServlet extends HttpServlet {
 	}
 	
 	private Date strTodate(String strDate) throws ParseException {
-		System.out.println(strDate);
 	    DateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		Date date = format.parse(strDate);
 		return date;

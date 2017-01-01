@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.sql.ResultSet;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -79,6 +81,7 @@ public class sendComment extends HttpServlet {
 		// TODO Auto-generated method stub
 		response.setContentType("text/html");
 		response.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
 		
 		String username = request.getParameter("username");
 		String mission = request.getParameter("mission");
@@ -86,15 +89,13 @@ public class sendComment extends HttpServlet {
 		String comment = request.getParameter("comment");
 		Date date = new Date();
 		
-		username = URLDecoder.decode(username, "UTF-8");
-		mission = URLDecoder.decode(mission, "UTF-8");
-		commentor = URLDecoder.decode(commentor, "UTF-8");
-		comment = URLDecoder.decode(comment, "UTF-8");
 		
 		String message = "";
 		
 		if (!username.equals("") && !mission.equals("") && !commentor.equals("") && !comment.equals("")) {
-		    Comment newComment = new Comment(commentor, mission, comment, username, date, "true", "false");
+		    Comment newComment = new Comment(username, mission, comment, commentor, date, "true", "false");
+		    commentDatabase.createComment(newComment);
+		    
 		    message = toJsonString("Success", date);
 		} else {
 			message = toJsonString("Fail", date);
@@ -109,8 +110,10 @@ public class sendComment extends HttpServlet {
 	
     private static String toJsonString(String status, Date date){  
         JSONObject jsonObject = new JSONObject();
+        DateFormat dFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         jsonObject.put("Status", status);
-        jsonObject.put("Date", date);
+        String str = dFormat.format(date);
+        jsonObject.put("Date", str);
         return jsonObject.toString();  
     }
 

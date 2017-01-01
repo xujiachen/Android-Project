@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.sql.ResultSet;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -51,6 +54,7 @@ public class adoptServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private commentDatabaseImpl commentDatabase;
 	private userDatabaseImpl userDatebase;
+	private missionDatabaseImpl missionDatabase;
 	private Connection connection;
     /**
      * @see HttpServlet#HttpServlet()
@@ -60,6 +64,8 @@ public class adoptServlet extends HttpServlet {
         GetConnection connectionClass = new GetConnection();
         connection = connectionClass.getConnection();
         commentDatabase = new commentDatabaseImpl(connection);
+        userDatebase = new userDatabaseImpl(connection);
+        missionDatabase = new missionDatabaseImpl(connection);
     }
 
 	/**
@@ -68,10 +74,13 @@ public class adoptServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		response.setContentType("text/html");
+		response.setCharacterEncoding("UTF-8");
+		
 		String mission = request.getParameter("mission");
 		String publisher = request.getParameter("publisher");
 		String username = request.getParameter("username");
-		Date date = new Date(request.getParameter("date"));
+		String strdate = request.getParameter("date");
 	    String gold = request.getParameter("gold");
 	    
 	    mission = URLDecoder.decode(mission, "UTF-8");
@@ -79,34 +88,58 @@ public class adoptServlet extends HttpServlet {
 	    username = URLDecoder.decode(username, "UTF-8");
 	    gold = URLDecoder.decode(gold, "UTF-8");
 	    
-	    String message = "";
-		
-		ArrayList<Comment> arrayList = new ArrayList<>();
-		arrayList = commentDatabase.findAllComment(mission, publisher);
-		if (!mission.equals("") && !publisher.equals("") && !username.equals("") && !request.getParameter("date").equals("") && !gold.equals("")) {
-			for (int i = 0; i < arrayList.size(); i++) {
-			    Comment temp = arrayList.get(i);
-			    if (temp.getUsername().equals(username) && temp.getDate().equals(date)) {
-			    	User adoptedUser = userDatebase.findUserByName(username);
-			    	User newStatus = new User(adoptedUser.getUsername(), adoptedUser.getPassword(), adoptedUser.getheadName(), adoptedUser.getDescription(), adoptedUser.getMoney() + Integer.parseInt(gold));
-			    	userDatebase.updateUser(newStatus);
-			    	temp.setIsAdopt("true_new");
-			    	message = toJsonString("Success");
-			    	break;
+	    DateFormat dFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    String tempDate;
+		try {
+			
+			String message = "";
+			
+			ArrayList<Comment> arrayList = new ArrayList<>();
+			
+			if (!mission.equals("") && !publisher.equals("") && !username.equals("") && !request.getParameter("date").equals("") && !gold.equals("")) {
+				arrayList = commentDatabase.findAllComment(mission, publisher);
+				//System.out.println(arrayList.size());
+				for (int i = 0; i < arrayList.size(); i++) {
+				    Comment temp = arrayList.get(i);
+				    //date = dFormat.parse(strdate);
+				    tempDate = dFormat.format(temp.getDate());
+				    
+				    if (temp.getUsername().equals(username) && tempDate.equals(strdate)) {
+				    	User askerUser = userDatebase.findUserByName(publisher);
+				    	User askerStatus = new User(askerUser.getUsername(), askerUser.getPassword(), askerUser.getheadName(), askerUser.getDescription(), askerUser.getMoney() - Integer.parseInt(gold));
+				    	userDatebase.updateUser(askerStatus);
+				    	
+				    	User adoptedUser = userDatebase.findUserByName(username);
+				    	User newStatus = new User(adoptedUser.getUsername(), adoptedUser.getPassword(), adoptedUser.getheadName(), adoptedUser.getDescription(), adoptedUser.getMoney() + Integer.parseInt(gold));
+				    	userDatebase.updateUser(newStatus);
+//				    	temp.setIsAdopt("true_new");
+				    	commentDatabase.updateComment(temp.getIsNew(), "new_true", temp.getDate());
+				    	
+				    	Mission newMission = missionDatabase.findMission(publisher, mission);
+				    	missionDatabase.updateMission(new Mission(newMission.getUsername(), newMission.getMissionName(), newMission.getContent(), "true", newMission.getType(), newMission.getCity(), newMission.getMoney(), newMission.getDate()));
+				    	
+				    	message = toJsonString("Success");
+				    	break;
+				    }
+				    
+				}
+				if (message.equals("")) {
+			    	message = toJsonString("Empty");
 			    }
-			    
+			} else {
+				message = toJsonString("Fail");
 			}
-			if (message.equals("")) {
-		    	message = toJsonString("Empty");
-		    }
-		} else {
-			message = toJsonString("Fail");
+			
+			PrintWriter out = response.getWriter();
+			out.print(message);
+			out.flush();
+			out.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		PrintWriter out = response.getWriter();
-		out.print(message);
-		out.flush();
-		out.close();
+	    
+	    
 	}
 
 	/**

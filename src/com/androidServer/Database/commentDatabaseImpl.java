@@ -1,6 +1,6 @@
 package com.androidServer.Database;
 
-import java.sql.Date;
+import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -51,22 +51,20 @@ public class commentDatabaseImpl {
 		}
 	}
 
-	/*public void updateComment(Comment comment) {
+	public void updateComment(String isNew,String isAdopt,Date date) {//此处的date指你所要更新的那条发表评论的时间
 		try {
-			sql = "update comments set username=?,missionName=?, comment=? where username=? and missionName=?";
+			sql = "update comments set isNew=?,isAdopt=? where date=?";
 			statement = (PreparedStatement)connection.prepareStatement(sql);
-			statement.setString(1, comment.getUsername());
-			statement.setString(2, comment.getMissionName());
-			statement.setString(3, comment.getComment());
-			statement.setString(4, comment.getUsername());
-			statement.setString(5, comment.getMissionName());
+			statement .setString(1, isNew );
+			statement .setString(2, isAdopt );
+			statement .setTimestamp(3, new Timestamp(date.getTime()));
 			statement.executeUpdate();
 			statement.close();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-	}*/
+	}
 	public ArrayList<Comment> findAllComment(String missionName,String missionUsername) {
 		Comment comment = null;
 		ArrayList<Comment> arrayList = new ArrayList<>();
@@ -77,7 +75,8 @@ public class commentDatabaseImpl {
 			statement.setString(2, missionName);
 			ResultSet resultSet = statement.executeQuery();
 			while (resultSet.next()) {
-			comment = new Comment(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3),resultSet.getString(4),resultSet.getTimestamp(5), resultSet.getString(6),resultSet.getString(7));
+			comment = new Comment(resultSet.getString(2), resultSet.getString(3), resultSet.getString(4),resultSet.getString(5),resultSet.getTimestamp(6), resultSet.getString(7),resultSet.getString(8));
+		//	System.out.println(comment.getMissionUsername()+comment.getMissionName()+comment.getComment()+comment.getUsername()+comment.getDate()+comment.getIsNew()+comment.getIsAdopt()+"hahah");
 			arrayList.add(comment);
 			}
 			return arrayList;

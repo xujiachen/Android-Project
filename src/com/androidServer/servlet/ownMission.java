@@ -69,6 +69,8 @@ public class ownMission extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		response.setContentType("text/html");
+		response.setCharacterEncoding("UTF-8");
 		String username = request.getParameter("username");
 		
 		username = URLDecoder.decode(username, "UTF-8");
